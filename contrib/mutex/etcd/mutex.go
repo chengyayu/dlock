@@ -32,10 +32,10 @@ func (m *Mutex) Unlock(ctx context.Context) error {
 }
 
 func (m *Mutex) Do(ctx context.Context, fn func() error) error {
+	defer m.Destructor()
 	if err := m.TryLock(ctx); err != nil {
 		return err
 	}
 	defer m.Unlock(ctx)
-	defer m.Destructor()
 	return fn()
 }
