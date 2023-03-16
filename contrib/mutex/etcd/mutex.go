@@ -3,6 +3,7 @@ package etcd
 import (
 	"context"
 	"github.com/chengyayu/dlock"
+	"github.com/pkg/errors"
 	clientv3 "go.etcd.io/etcd/client/v3"
 	"go.etcd.io/etcd/client/v3/concurrency"
 )
@@ -31,11 +32,15 @@ func (m *Mutex) Unlock(ctx context.Context) error {
 	return m.Mutex.Unlock(ctx)
 }
 
-func (m *Mutex) Do(ctx context.Context, fn func() error) error {
+func (m *Mutex) Do(ctx context.Context, fn func() error) (err error) {
 	defer m.Destructor()
 	if err := m.TryLock(ctx); err != nil {
 		return err
 	}
-	defer m.Unlock(ctx)
+	defer func() {
+		if tempErr := m.Unlock(ctx); tempErr != nil {
+			err = tempErr
+		}
+	}()
 	return fn()
 }

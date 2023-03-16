@@ -31,11 +31,15 @@ func (m *Mutex) Unlock(ctx context.Context) error {
 	return nil
 }
 
-func (m *Mutex) Do(ctx context.Context, fn func() error) error {
+func (m *Mutex) Do(ctx context.Context, fn func() error) (err error) {
 	defer m.Destructor()
 	if err := m.TryLock(ctx); err != nil {
 		return err
 	}
-	defer m.Unlock(ctx)
+	defer func() {
+		if tempErr := m.Unlock(ctx); tempErr != nil {
+			err = tempErr
+		}
+	}()
 	return fn()
 }
