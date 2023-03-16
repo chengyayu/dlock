@@ -21,15 +21,15 @@ func (m *Mutex) Destructor() {
 }
 
 func (m *Mutex) Lock(ctx context.Context) error {
-	return m.Mutex.Lock(ctx)
+	return errors.Wrap(m.Mutex.Lock(ctx), "lock failed")
 }
 
 func (m *Mutex) TryLock(ctx context.Context) error {
-	return m.Mutex.TryLock(ctx)
+	return errors.Wrap(m.Mutex.TryLock(ctx), "tryLock failed")
 }
 
 func (m *Mutex) Unlock(ctx context.Context) error {
-	return m.Mutex.Unlock(ctx)
+	return errors.Wrap(m.Mutex.Unlock(ctx), "unlock failed")
 }
 
 func (m *Mutex) Do(ctx context.Context, fn func() error) (err error) {
