@@ -31,9 +31,11 @@ func TestExampleDo(t *testing.T) {
 	m1.Do(context.TODO(), func() error {
 		fmt.Println("acquired lock for s1")
 
-		// TODO: why not print?
 		if err = m2.TryLock(context.TODO()); err == nil {
 			log.Fatal("should not acquire lock")
+		}
+		if err != nil {
+			fmt.Println("cannot acquire lock for s2, as already locked in another session")
 		}
 
 		fmt.Println("released lock for s1")
